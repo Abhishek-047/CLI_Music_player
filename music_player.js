@@ -210,6 +210,7 @@ function listSongs() {
     })
 
     console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle | f Fav')
+    console.log('+ / - Volume')
     const repeatIcon = repeatMode ? '🔁 ON' : 'OFF'
     const shuffleIcon = shuffleMode ? '🔀 ON' : 'OFF'
     console.log(`Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon} | Shuffle: ${shuffleIcon}`)
@@ -288,6 +289,22 @@ process.stdin.on('data', (data) => {
     if (data[0] === 0x68) {
         shuffleMode = !shuffleMode
         listSongs()
+        return
+    }
+
+    // ==========================
+    // VOLUME UP - + or =
+    // ==========================
+    if (data[0] === 0x2b || data[0] === 0x3d) {
+        spawn('osascript', ['-e', 'set volume output volume (output volume of (get volume settings) + 10)'])
+        return
+    }
+
+    // ==========================
+    // VOLUME DOWN - -
+    // ==========================
+    if (data[0] === 0x2d) {
+        spawn('osascript', ['-e', 'set volume output volume (output volume of (get volume settings) - 10)'])
         return
     }
 
