@@ -138,11 +138,10 @@ let userChoice = 0
 let elapsedDuration = 0
 let totalDuration = 0
 
-const songMenu = [
-    "./songs/the_mountain-short-intro-159129.mp3",
-    "./songs/white_records-dramatic-background-short-music-29-sec-hip-hop-violin-orchestral-148927.mp3",
-    "./songs/white_records-dramatic-background-music-for-short-videos-1-minute-little-alicia-155718.mp3"
-]
+const fs = require('fs')
+const songMenu = fs.readdirSync('./songs')
+    .filter(f => f.endsWith('.mp3'))
+    .map(f => './songs/' + f)
 
 
 // ==========================
