@@ -141,6 +141,8 @@ let manualStop = false
 let repeatMode = false
 let shuffleMode = false
 let favorites = new Set()
+let searchMode = false
+let searchQuery = ''
 
 const fs = require('fs')
 const songMenu = fs.readdirSync('./songs')
@@ -221,6 +223,12 @@ function listSongs() {
     const bar = '[' + '='.repeat(filled) + (empty > 0 ? '>' : '') + ' '.repeat(Math.max(0, empty - 1)) + ']'
     
     console.log(`Time: ${Math.floor(elapsedDuration)}s / ${totalDuration}s  ${bar}`)
+
+    if (searchMode) {
+        console.log(`\n🔍 Search: ${searchQuery}_`)
+    } else {
+        console.log('\nType / to search')
+    }
 }
 
 
@@ -229,6 +237,38 @@ function listSongs() {
 // ==========================
 
 process.stdin.on('data', (data) => {
+
+    if (searchMode) {
+        if (data[0] === 0x0d) { // Enter
+            searchMode = false
+            const idx = songMenu.findIndex(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+            if (idx !== -1) {
+                userChoice = idx
+                playSong()
+            }
+            listSongs()
+            return
+        } else if (data[0] === 0x1b) { // Escape
+            searchMode = false
+            listSongs()
+            return
+        } else if (data[0] === 0x7f) { // Backspace
+            searchQuery = searchQuery.slice(0, -1)
+            listSongs()
+            return
+        } else {
+            searchQuery += data.toString()
+            listSongs()
+            return
+        }
+    }
+
+    if (data[0] === 0x2f) { // Slash '/'
+        searchMode = true
+        searchQuery = ''
+        listSongs()
+        return
+    }
 
     // ==========================
     // UP ARROW
