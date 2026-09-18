@@ -139,6 +139,7 @@ let elapsedDuration = 0
 let totalDuration = 0
 let manualStop = false
 let repeatMode = false
+let shuffleMode = false
 
 const fs = require('fs')
 const songMenu = fs.readdirSync('./songs')
@@ -166,7 +167,11 @@ function playSong() {
     playerProcess.on('close', () => {
         if (!manualStop) {
             if (!repeatMode) {
-                userChoice = (userChoice + 1) % songMenu.length
+                if (shuffleMode) {
+                    userChoice = Math.floor(Math.random() * songMenu.length)
+                } else {
+                    userChoice = (userChoice + 1) % songMenu.length
+                }
             }
             playSong()
             listSongs()
@@ -202,9 +207,10 @@ function listSongs() {
 
     })
 
-    console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat')
+    console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle')
     const repeatIcon = repeatMode ? '🔁 ON' : 'OFF'
-    console.log(`Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon}`)
+    const shuffleIcon = shuffleMode ? '🔀 ON' : 'OFF'
+    console.log(`Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon} | Shuffle: ${shuffleIcon}`)
     
     const pct = totalDuration > 0 ? (elapsedDuration / totalDuration) : 0
     const filled = Math.min(20, Math.floor(pct * 20))
@@ -270,6 +276,15 @@ process.stdin.on('data', (data) => {
     // ==========================
     if (data[0] === 0x72) {
         repeatMode = !repeatMode
+        listSongs()
+        return
+    }
+
+    // ==========================
+    // SHUFFLE - h
+    // ==========================
+    if (data[0] === 0x68) {
+        shuffleMode = !shuffleMode
         listSongs()
         return
     }
