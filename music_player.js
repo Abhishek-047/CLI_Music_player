@@ -140,6 +140,7 @@ let totalDuration = 0
 let manualStop = false
 let repeatMode = false
 let shuffleMode = false
+let favorites = new Set()
 
 const fs = require('fs')
 const songMenu = fs.readdirSync('./songs')
@@ -198,16 +199,17 @@ function listSongs() {
     songMenu.forEach((song, ind) => {
         
         const cleanName = song.split('/').pop()
+        const favStar = favorites.has(song) ? '⭐ ' : '   '
 
         if (ind === userChoice) {
-            console.log(`> ${ind + 1} : ${cleanName}`)
+            console.log(`> ${ind + 1} : ${favStar}${cleanName}`)
         } else {
-            console.log(`  ${ind + 1} : ${cleanName}`)
+            console.log(`  ${ind + 1} : ${favStar}${cleanName}`)
         }
 
     })
 
-    console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle')
+    console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle | f Fav')
     const repeatIcon = repeatMode ? '🔁 ON' : 'OFF'
     const shuffleIcon = shuffleMode ? '🔀 ON' : 'OFF'
     console.log(`Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon} | Shuffle: ${shuffleIcon}`)
@@ -285,6 +287,20 @@ process.stdin.on('data', (data) => {
     // ==========================
     if (data[0] === 0x68) {
         shuffleMode = !shuffleMode
+        listSongs()
+        return
+    }
+
+    // ==========================
+    // FAVORITE - f
+    // ==========================
+    if (data[0] === 0x66) {
+        const song = songMenu[userChoice]
+        if (favorites.has(song)) {
+            favorites.delete(song)
+        } else {
+            favorites.add(song)
+        }
         listSongs()
         return
     }
