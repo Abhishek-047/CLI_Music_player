@@ -137,6 +137,7 @@ let userChoice = 0
 
 let elapsedDuration = 0
 let totalDuration = 0
+let manualStop = false
 
 const fs = require('fs')
 const songMenu = fs.readdirSync('./songs')
@@ -151,13 +152,23 @@ const songMenu = fs.readdirSync('./songs')
 function playSong() {
 
     if (playerProcess) {
+        manualStop = true
         playerProcess.kill('SIGKILL')
     }
 
+    manualStop = false
     playerProcess = spawn('vlc', [
         '--intf', 'dummy',
         songMenu[userChoice]
     ])
+
+    playerProcess.on('close', () => {
+        if (!manualStop) {
+            userChoice = (userChoice + 1) % songMenu.length
+            playSong()
+            listSongs()
+        }
+    })
 
     isPaused = false
 
@@ -335,6 +346,7 @@ process.stdin.on('data', (data) => {
 
         if (playerProcess) {
 
+            manualStop = true
             playerProcess.kill('SIGKILL')
             playerProcess = undefined
 
@@ -381,6 +393,7 @@ process.stdin.on('data', (data) => {
 function quit() {
 
     if (playerProcess) {
+        manualStop = true
         playerProcess.kill('SIGKILL')
     }
 
