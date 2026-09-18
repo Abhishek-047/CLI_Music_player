@@ -162,7 +162,8 @@ function playSong() {
 
     isPaused = false
 
-    console.log(`\nPlaying: ${songMenu[userChoice]}`)
+    const cleanName = songMenu[userChoice].split('/').pop()
+    console.log(`\nPlaying: ${cleanName}`)
 }
 
 
@@ -177,16 +178,19 @@ function listSongs() {
     process.stdout.write('\x1b[H')
 
     songMenu.forEach((song, ind) => {
+        
+        const cleanName = song.split('/').pop()
 
         if (ind === userChoice) {
-            console.log(`> ${ind} : ${song}`)
+            console.log(`> ${ind + 1} : ${cleanName}`)
         } else {
-            console.log(`  ${ind} : ${song}`)
+            console.log(`  ${ind + 1} : ${cleanName}`)
         }
 
     })
 
     console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit')
+    console.log(`Track: ${userChoice + 1} / ${songMenu.length}`)
     console.log(`Elapsed / total : ${elapsedDuration} / ${totalDuration}`)
 }
 
