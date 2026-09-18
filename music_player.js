@@ -190,7 +190,13 @@ function listSongs() {
 
     console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit')
     console.log(`Track: ${userChoice + 1} / ${songMenu.length}`)
-    console.log(`Elapsed / total : ${elapsedDuration} / ${totalDuration}`)
+    
+    const pct = totalDuration > 0 ? (elapsedDuration / totalDuration) : 0
+    const filled = Math.min(20, Math.floor(pct * 20))
+    const empty = Math.max(0, 20 - filled)
+    const bar = '[' + '='.repeat(filled) + (empty > 0 ? '>' : '') + ' '.repeat(Math.max(0, empty - 1)) + ']'
+    
+    console.log(`Time: ${Math.floor(elapsedDuration)}s / ${totalDuration}s  ${bar}`)
 }
 
 
