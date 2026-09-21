@@ -195,46 +195,45 @@ function playSong() {
 
 function listSongs() {
 
-    // Clear terminal
-    process.stdout.write('\x1b[2J')
-    process.stdout.write('\x1b[H')
+    let output = '\x1b[H' // Move cursor to top left
 
     if (nowPlaying) {
-        console.log(`♪ Now Playing: ${nowPlaying}\n`)
+        output += `♪ Now Playing: ${nowPlaying}\n\n`
     } else {
-        console.log('♪ No song playing\n')
+        output += '♪ No song playing\n\n'
     }
+    
     songMenu.forEach((song, ind) => {
-        
         const cleanName = song.split('/').pop()
         const favStar = favorites.has(song) ? '⭐ ' : '   '
-
         if (ind === userChoice) {
-            console.log(`> ${ind + 1} : ${favStar}${cleanName}`)
+            output += `> ${ind + 1} : ${favStar}${cleanName}\n`
         } else {
-            console.log(`  ${ind + 1} : ${favStar}${cleanName}`)
+            output += `  ${ind + 1} : ${favStar}${cleanName}\n`
         }
-
     })
 
-    console.log('\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle | f Fav')
-    console.log('+ / - Volume')
+    output += '\n↑ ↓ Select | Enter Play | n Next | b Back | p Pause/Play | s Stop | q Quit | r Repeat | h Shuffle | f Fav\n'
+    output += '+ / - Volume\n'
     const repeatIcon = repeatMode ? '🔁 ON' : 'OFF'
     const shuffleIcon = shuffleMode ? '🔀 ON' : 'OFF'
-    console.log(`Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon} | Shuffle: ${shuffleIcon}`)
+    output += `Track: ${userChoice + 1} / ${songMenu.length} | Repeat: ${repeatIcon} | Shuffle: ${shuffleIcon}\n`
     
     const pct = totalDuration > 0 ? (elapsedDuration / totalDuration) : 0
     const filled = Math.min(20, Math.floor(pct * 20))
     const empty = Math.max(0, 20 - filled)
     const bar = '[' + '='.repeat(filled) + (empty > 0 ? '>' : '') + ' '.repeat(Math.max(0, empty - 1)) + ']'
     
-    console.log(`Time: ${Math.floor(elapsedDuration)}s / ${totalDuration}s  ${bar}`)
+    output += `Time: ${Math.floor(elapsedDuration)}s / ${totalDuration}s  ${bar}\n`
 
     if (searchMode) {
-        console.log(`\n🔍 Search: ${searchQuery}_`)
+        output += `\n🔍 Search: ${searchQuery}_\n`
     } else {
-        console.log('\nType / to search')
+        output += '\nType / to search\n'
     }
+    
+    output += '\x1b[0J' // Clear down (prevents trailing artifacts)
+    process.stdout.write(output)
 }
 
 
@@ -525,10 +524,10 @@ setInterval(() => {
 function getTotalDurationofsong(songPath) {
     const afInfoProcess = spawn('afinfo', [songPath])
     afInfoProcess.stdout.on('data', (data) => {
-        const rawOutput = data.toString()
-        totalDuration = Number(
-            rawOutput.match('estimated duration: ')[1].split('.')[0]
-        )
+        const match = rawOutput.match(/estimated duration:\s+([\d.]+)/)
+        if (match) {
+            totalDuration = Number(match[1].split('.')[0])
+        }
     })
 }
 
