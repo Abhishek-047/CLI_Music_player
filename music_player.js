@@ -143,6 +143,7 @@ let shuffleMode = false
 let favorites = new Set()
 let searchMode = false
 let searchQuery = ''
+let nowPlaying = ''
 
 const fs = require('fs')
 const songMenu = fs.readdirSync('./songs')
@@ -182,9 +183,9 @@ function playSong() {
     })
 
     isPaused = false
-
-    const cleanName = songMenu[userChoice].split('/').pop()
-    console.log(`\nPlaying: ${cleanName}`)
+    elapsedDuration = 0
+    nowPlaying = songMenu[userChoice].split('/').pop()
+    getTotalDurationofsong(songMenu[userChoice])
 }
 
 
@@ -198,6 +199,11 @@ function listSongs() {
     process.stdout.write('\x1b[2J')
     process.stdout.write('\x1b[H')
 
+    if (nowPlaying) {
+        console.log(`♪ Now Playing: ${nowPlaying}\n`)
+    } else {
+        console.log('♪ No song playing\n')
+    }
     songMenu.forEach((song, ind) => {
         
         const cleanName = song.split('/').pop()
@@ -511,10 +517,10 @@ function quit() {
 
 setInterval(() => {
     listSongs()
-    if (isPaused === false && playerProcess === undefined) {
+    if (playerProcess !== undefined && isPaused === false) {
         elapsedDuration += 0.05
     }
-},50)
+}, 50)
 
 function getTotalDurationofsong(songPath) {
     const afInfoProcess = spawn('afinfo', [songPath])
