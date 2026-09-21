@@ -524,6 +524,7 @@ setInterval(() => {
 function getTotalDurationofsong(songPath) {
     const afInfoProcess = spawn('afinfo', [songPath])
     afInfoProcess.stdout.on('data', (data) => {
+        const rawOutput = data.toString()
         const match = rawOutput.match(/estimated duration:\s+([\d.]+)/)
         if (match) {
             totalDuration = Number(match[1].split('.')[0])
